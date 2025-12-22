@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: /home/xuanwu/Code_Program/smilei_spin/smilei_spin_env.sif
+From: /home/xuanwu/Code_Program/smilei_spin/smilei_spin_env
 
 %files
 

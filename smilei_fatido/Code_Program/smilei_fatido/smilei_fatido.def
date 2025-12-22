@@ -1,9 +1,9 @@
 Bootstrap: localimage
-From: /home/xuanwu/Code_Program/smilei_fatido_no_rad_push/smilei_fatido_no_rad_push_env.sif
+From: /home/xuanwu/Code_Program/smilei_fatido/smilei_fatido_env
 
 %files
 
-./smilei_fatido_no_rad_push.tar.gz /opt/.local/program/smilei_fatido_no_rad_push.tar.gz
+./smilei_fatido.tar.gz /opt/.local/program/smilei_fatido.tar.gz
 
 %post
 
@@ -11,10 +11,10 @@ export HDF5_ROOT_DIR=/opt/.local/program/hdf5
 export PYTHONEXE=python3
 
 cd /opt/.local/program
-tar -zxvf smilei_fatido_no_rad_push.tar.gz
-rm smilei_fatido_no_rad_push.tar.gz
+tar -zxvf smilei_fatido.tar.gz
+rm smilei_fatido.tar.gz
 
-cd ./Smilei_FaTiDo_no_rad_push/
+cd ./Smilei_FaTiDo/
 make -j32
 
 # clean src
@@ -39,7 +39,7 @@ rm -rf \
 export FI_PROVIDER=verbs
 export I_MPI_FABRICS=shm:ofi
 export LD_LIBRARY_PATH=/opt/.local/program/hdf5/lib:$LD_LIBRARY_PATH
-export PATH=/opt/.local/program/Smilei_FaTiDo_no_rad_push:$PATH
+export PATH=/opt/.local/program/Smilei_FaTiDo:$PATH
 
 %runscript
 

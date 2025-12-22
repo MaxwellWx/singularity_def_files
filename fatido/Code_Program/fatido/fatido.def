@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: /home/xuanwu/Code_Program/fatido/fatido_env.sif
+From: /home/xuanwu/Code_Program/fatido/fatido_env
 
 %files
 

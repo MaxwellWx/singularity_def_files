@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: /home/xuanwu/Code_Program/warpx_1d/warpx_env.sif
+From: /home/xuanwu/Code_Program/warpx_1d/warpx_1d_env
 
 %files
 
