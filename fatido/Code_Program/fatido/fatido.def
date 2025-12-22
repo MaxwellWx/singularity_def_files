@@ -1,0 +1,55 @@
+Bootstrap: localimage
+From: /home/xuanwu/Code_Program/fatido/fatido_env.sif
+
+%files
+
+./fatido.tar.gz /opt/.local/program/fatido.tar.gz
+
+%post
+
+# unzip fatido
+cd /opt/.local/program
+tar -zxvf fatido.tar.gz
+rm fatido.tar.gz
+
+# compile fatido
+cd ./FaTiDo
+mkdir -p build
+cd ./build
+rm -rf ./*
+cmake ..
+make -j8
+cd ..
+
+# nuitka compile py
+python3 -m nuitka \
+  --lto=yes \
+  --follow-imports \
+  --enable-plugin=numpy \
+  --nofollow-import-to=numpy \
+  --nofollow-import-to=h5py \
+  --nofollow-import-to=mpi4py \
+  --output-filename=fatido \
+  FaTiDo_mpi.py
+
+# clean src
+rm -rf __pycache__ \
+  src \
+  pythonAPI \
+  .git \
+  .gitignore \
+  FaTiDo_mpi.py \
+  func4SMILEI.py \
+  pybind11 \
+  CMakeLists.txt
+
+%environment
+
+export FI_PROVIDER=verbs
+export I_MPI_FABRICS=shm:ofi
+export PYTHONUNBUFFERED=1
+export PATH=/opt/.local/program/FaTiDo:$PATH
+
+%runscript
+
+exec fatido "$@"

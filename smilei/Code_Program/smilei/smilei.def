@@ -1,0 +1,46 @@
+Bootstrap: localimage
+From: /home/xuanwu/Code_Program/smilei/smilei_env.sif
+
+%files
+
+./smilei.tar.gz /opt/.local/program/smilei.tar.gz
+
+%post
+
+export HDF5_ROOT_DIR=/opt/.local/program/hdf5
+export PYTHONEXE=python3
+
+cd /opt/.local/program
+tar -zxvf smilei.tar.gz
+rm smilei.tar.gz
+
+cd ./Smilei/
+make -j32
+
+# clean src
+rm -rf \
+  src \
+  benchmarks \
+  validation \
+  doc \
+  tools \
+  scripts \
+  makefile \
+  CMakeLists.txt \
+  .git \
+  .github \
+  .gitignore \
+  .gitlab-ci.yml \
+  License \
+  README.md
+
+%environment
+
+export FI_PROVIDER=verbs
+export I_MPI_FABRICS=shm:ofi
+export LD_LIBRARY_PATH=/opt/.local/program/hdf5/lib:$LD_LIBRARY_PATH
+export PATH=/opt/.local/program/Smilei:$PATH
+
+%runscript
+
+exec smilei "$@"
