@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: manimcommunity/manim:v0.18.1
+
+%post
+
+pip install --no-cache-dir sympy h5py matplotlib
+
+%environment
+
+export TERM=xterm-256color
+
+%runscript
+
+exec manim "$@"
