@@ -1,0 +1,46 @@
+Bootstrap: docker
+From: python:3.10-slim
+
+%environment
+
+export HF_HOME="/opt/huggingface"
+export TRANSFORMERS_OFFLINE=1
+export PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True"
+
+%post
+
+apt-get update && apt-get install -y --no-install-recommends \
+  git \
+  wget &&
+  rm -rf /var/lib/apt/lists/*
+
+pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cu121
+
+pip install --no-cache-dir transformers sentencepiece pysrt tqdm safetensors protobuf
+
+mkdir -p /opt/huggingface
+export HF_HOME="/opt/huggingface"
+
+python3 -c "
+import os
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM;
+
+model_id = 'facebook/nllb-200-distilled-1.3B';
+save_path = '/opt/nllb-model';
+os.makedirs(save_path, exist_ok=True);
+
+print(f'Downloading and flattening {model_id} to {save_path}...');
+# 1. Tokenizer
+tok = AutoTokenizer.from_pretrained(model_id);
+tok.save_pretrained(save_path);
+
+# 2. Model
+model = AutoModelForSeq2SeqLM.from_pretrained(model_id, use_safetensors=True);
+model.save_pretrained(save_path);
+
+print('Model flattened and baked into image successfully.')
+"
+
+%runscript
+
+exec python3 "$@"
