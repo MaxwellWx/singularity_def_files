@@ -1,30 +1,34 @@
 Bootstrap: localimage
-From: /home/xuanwu/Code_Program/warpx_2d/warpx_2d_env
+From: /home/xuanwu/Code_Program/warpx/warpx_env
 
 %files
 
-./warpx_2d.tar.gz /opt/.local/program/warpx_2d.tar.gz
+./warpx.tar.gz /opt/.local/program/warpx.tar.gz
 
 %post
 
 export PYTHONEXE=python3
 
-cd /opt/.local/program
-tar -zxvf warpx_2d.tar.gz
-rm warpx_2d.tar.gz
+export PATH="/opt/conda/envs/warpx-cpu-mpich-dev/bin:${PATH}"
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
+cd /opt/.local/program
+tar -zxvf warpx.tar.gz
+rm warpx.tar.gz
 cd ./WarpX/
+
 cmake -S . -B build \
   -DWarpX_MPI=ON \
   -DWarpX_PYTHON=ON \
-  -DWarpX_DIMS="2" \
+  -DWarpX_DIMS="1;2;3;RZ;RCYLINDER;RSPHERE" \
   -DCMAKE_INSTALL_PREFIX=/opt/warpx
 
 cmake --build build -j 32
 
+cmake --build build --target pip_install -j 32
+
 cmake --install build
 
-# clean src
 cd ..
 rm -rf WarpX
 
@@ -34,7 +38,3 @@ export FI_PROVIDER=verbs
 export I_MPI_FABRICS=shm:ofi
 export PATH=/opt/warpx/bin:$PATH
 export LD_LIBRARY_PATH=/opt/warpx/lib:$LD_LIBRARY_PATH
-
-%runscript
-
-exec warpx.2d.MPI.OMP.DP.PDP.OPMD.EB.QED "$@"

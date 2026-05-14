@@ -1,0 +1,56 @@
+Bootstrap: docker
+From: condaforge/miniforge3:latest
+
+%post
+
+export DEBIAN_FRONTEND=noninteractive
+
+export COLUMNS=150
+export LINES=40
+
+export TZ=Asia/Shanghai
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+
+set -eux
+
+mkdir -p /etc/conda
+
+cat >/etc/conda/.condarc <<'EOF'
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+channel_priority: strict
+show_channel_urls: true
+EOF
+
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+script -q -e -c 'mamba create -y -n warpx-cpu-mpich-dev \
+  -c conda-forge blaspp boost ccache cmake \
+  compilers git lapackpp "openpmd-api=*=mpi_mpich*" \
+  openpmd-viewer packaging pytest python python-build \
+  make numpy pandas scipy setuptools yt "fftw=*=mpi_mpich*" \
+  pkg-config matplotlib mpich mpi4py ninja pip \
+  virtualenv wheel llvm-openmp' /dev/null
+
+script -q -e -c 'mamba install -c conda-forge libgomp' /dev/null
+
+mamba clean --all --yes
+
+rm -rf /opt/conda/pkgs/*.tar.bz2 || true
+
+rm -rf /opt/conda/share/doc /opt/conda/share/man || true
+
+%environment
+
+export CONDA_PREFIX="/opt/conda/envs/warpx-cpu-mpich-dev"
+export CONDA_DEFAULT_ENV="warpx-cpu-mpich-dev"
+export PATH="/opt/conda/envs/warpx-cpu-mpich-dev/bin:${PATH}"
+
+export CONDA_ALWAYS_YES="true"
+export CONDA_ROOT="/opt/conda"
+export FI_PROVIDER=verbs
+export I_MPI_FABRICS=shm:ofi
+
+export LD_LIBRARY_PATH=/opt/.local/program/hdf5/lib:$LD_LIBRARY_PATH
+
+%runscript
